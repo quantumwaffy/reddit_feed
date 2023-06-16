@@ -4,16 +4,13 @@ from core import base as core_base
 
 
 class Subreddit(core_base.BaseModel):
-    name = fields.CharField(max_length=50)
+    name = fields.CharField(max_length=50, unique=True)
 
     class Meta:
         table_description = "Subreddit"
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__} '{self.name}'"
-
-    class PydanticMeta:
-        exclude = ("id",)
 
 
 class Post(core_base.BaseModel):
@@ -32,6 +29,3 @@ class Post(core_base.BaseModel):
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__} #{self.pk}"
-
-    class PydanticMeta:
-        exclude = ("id",)

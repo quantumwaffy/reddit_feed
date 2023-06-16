@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 
+from . import router
 from .settings import SETTINGS
 
 
@@ -10,6 +11,8 @@ def get_app() -> FastAPI:
         swagger_ui_parameters={"persistAuthorization": True},
         **{"docs_url": None, "redoc_url": None} if not SETTINGS.APP.DEBUG else {}
     )
+    for prefix, routs in router.AppRouter.routers:
+        [api.include_router(router, prefix=prefix) for router in routs]
     return api
 
 

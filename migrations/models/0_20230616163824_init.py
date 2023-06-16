@@ -11,7 +11,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
 );
 CREATE TABLE IF NOT EXISTS "feed__subreddit" (
     "id" SERIAL NOT NULL PRIMARY KEY,
-    "name" VARCHAR(50) NOT NULL
+    "name" VARCHAR(50) NOT NULL UNIQUE
 );
 COMMENT ON TABLE "feed__subreddit" IS 'Subreddit';
 CREATE TABLE IF NOT EXISTS "feed__post" (

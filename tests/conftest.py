@@ -1,39 +1,34 @@
-import asyncio
 from typing import Generator
 from uuid import uuid4
 
 import pytest
-from fastapi import FastAPI
-from starlette.testclient import TestClient
-from tortoise.contrib.fastapi import register_tortoise
+from httpx import AsyncClient
+from tortoise import Tortoise
 
-from core.main import get_app
+from core.main import app
 from core.settings import SETTINGS
-from feed import models
+from feed import models as feed_models
 
 
-@pytest.fixture(scope="module")
-def test_app() -> Generator[TestClient, None, None]:
-    app: FastAPI = get_app()
-
-    register_tortoise(
-        app,
-        config=SETTINGS.ORM.test_config,
-        generate_schemas=True,
-        add_exception_handlers=True,
-    )
-
-    with TestClient(app) as test_client:
-        yield test_client
+@pytest.fixture(scope="session")
+def anyio_backend() -> str:
+    return "asyncio"
 
 
-@pytest.fixture(scope="module")
-def event_loop(test_app: TestClient) -> asyncio.AbstractEventLoop:
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-    return loop
+@pytest.fixture(scope="session")
+async def client() -> Generator[AsyncClient, None, None]:
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
 
 
-@pytest.fixture(scope="module")
-def subreddit(event_loop: asyncio.AbstractEventLoop) -> models.Subreddit:
-    return event_loop.run_until_complete(models.Subreddit.create(name=f"subreddit_{uuid4().hex}"))
+@pytest.fixture(scope="session", autouse=True)
+async def initialize_tests() -> Generator[None, None, None]:
+    await Tortoise.init(config=SETTINGS.ORM.test_config, _create_db=True)
+    await Tortoise.generate_schemas()
+    yield
+    await Tortoise._drop_databases()
+
+
+@pytest.fixture(scope="session")
+async def subreddit() -> feed_models.Subreddit:
+    return await feed_models.Subreddit.create(name=f"subreddit_{uuid4().hex}")

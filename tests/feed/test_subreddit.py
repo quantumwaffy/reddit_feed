@@ -1,10 +1,11 @@
+import pytest
 from fastapi import status
-from httpx import Response
-from starlette.testclient import TestClient
+from httpx import AsyncClient, Response
 
 
-def test_create_subreddit(test_app: TestClient):
+@pytest.mark.anyio
+async def test_create_subreddit(client: AsyncClient):
     data: dict[str, str] = {"name": "subreddit_test"}
-    response: Response = test_app.post("/api/v1/subreddit/create", json=data)
+    response: Response = await client.post("/api/v1/subreddit/create", json=data)
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json()["name"] == data["name"]

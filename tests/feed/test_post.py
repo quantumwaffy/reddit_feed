@@ -1,12 +1,13 @@
+import pytest
 from fastapi import status
-from httpx import Response
-from starlette.testclient import TestClient
+from httpx import AsyncClient, Response
 
 from core.settings import SETTINGS
 from feed import models
 
 
-def test_create_post(test_app: TestClient, subreddit: models.Subreddit):
+@pytest.mark.anyio
+async def test_create_post(client: AsyncClient, subreddit: models.Subreddit):
     data: dict[str, str | int | bool | None] = {
         "title": "test_title",
         "author": f"{SETTINGS.FEED.AUTHOR_PREFIX}test",
@@ -17,7 +18,7 @@ def test_create_post(test_app: TestClient, subreddit: models.Subreddit):
         "promoted": False,
         "nsfw": False,
     }
-    response: Response = test_app.post("/api/v1/post/create", json=data)
+    response: Response = await client.post("/api/v1/post/create", json=data)
     assert response.status_code == status.HTTP_201_CREATED
     response_data: dict[str, str | int | bool | None | dict[str, str]] = response.json()
     assert response_data.pop("subreddit")["id"] == data.pop("subreddit_id")

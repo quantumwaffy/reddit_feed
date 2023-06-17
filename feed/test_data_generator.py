@@ -28,7 +28,7 @@ async def create_test_data(post_count: int, promoted_percent: int, nsfw_percent:
                         author=f"{SETTINGS.FEED.AUTHOR_PREFIX}{kind}{i}",
                         subreddit=subreddit,
                         content=f"{kind}_content_{i}",
-                        score=random.randint(-100, 100),
+                        score=random.randint(-600, 600),
                         promoted=kind == PostKindCounts.PROMOTION,
                         nsfw=kind == PostKindCounts.NSFW,
                     )

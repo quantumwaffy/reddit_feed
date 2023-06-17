@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "reddit_feed"
+version = "0.1.0"
+description = "Reddit Feed"
+authors = ["quantumwaffy <sashchystyh@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.2"
+tortoise-orm = {extras = ["asyncpg"], version = "^0.19.3"}
+python-dotenv = "^1.0.0"
+aerich = "^0.7.1"
+uvicorn = "^0.22.0"
+validators = "^0.20.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.3.3"
+pytest = "^7.3.2"
+httpx = "^0.24.1"
+
+
+[tool.aerich]
+tortoise_orm = "core.database.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."

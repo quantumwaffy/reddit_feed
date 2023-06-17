@@ -4,6 +4,8 @@ from uuid import uuid4
 
 from tortoise.transactions import in_transaction
 
+from core.settings import SETTINGS
+
 from . import models
 from .consts import PostKindCounts
 
@@ -23,7 +25,7 @@ async def create_test_data(post_count: int, promoted_percent: int, nsfw_percent:
                 [
                     models.Post(
                         title=f"{kind}_title_{i}",
-                        author=f"t2_{kind}{i}",
+                        author=f"{SETTINGS.FEED.AUTHOR_PREFIX}{kind}{i}",
                         subreddit=subreddit,
                         content=f"{kind}_content_{i}",
                         score=random.randint(-100, 100),

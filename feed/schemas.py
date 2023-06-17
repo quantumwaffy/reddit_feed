@@ -2,6 +2,8 @@ import validators
 from pydantic import BaseModel, Field, root_validator, validator
 from tortoise.contrib.pydantic import pydantic_model_creator
 
+from core.settings import SETTINGS
+
 from . import consts, models
 
 BasePost = pydantic_model_creator(models.Post, name="BasePost")
@@ -13,7 +15,7 @@ NewSubredditOutput = pydantic_model_creator(models.Subreddit, name="NewSubreddit
 
 
 class PostInput(BasePostInput):
-    author: str = Field(regex=r"^t2_[a-z0-9]+$")
+    author: str = Field(regex=rf"^{SETTINGS.FEED.AUTHOR_PREFIX}[a-z0-9]+$")
     subreddit_id: int
 
     @validator("link")
@@ -34,7 +36,7 @@ class PostInput(BasePostInput):
 class TestDataInput(BaseModel):
     post_count: int = Field(
         150,
-        ge=1,
+        ge=SETTINGS.FEED.PAGE_SIZE,
         le=250,
         title="Count of posts",
         description="Count of posts of all kinds to create",

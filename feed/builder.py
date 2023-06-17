@@ -43,12 +43,13 @@ class AbstractBuilder(abc.ABC):
             self._check_and_insert(promotion_post, promotion_ind - 1, feed)
         return await self._serialize_feed(feed)
 
-    @staticmethod
-    def _check_and_insert(promotion_post: models.Post, promotion_ind: int, feed: list[models.Post]) -> None:
+    def _check_and_insert(self, promotion_post: models.Post, promotion_ind: int, feed: list[models.Post]) -> None:
         if promotion_ind >= len(feed):
             return
         if not tuple(filter(lambda post: post.nsfw, feed[promotion_ind - 1 : promotion_ind + 2])):
             feed.insert(promotion_ind, promotion_post)
+        elif self._feed_settings.SHIFT_ON:
+            self._check_and_insert(promotion_post, promotion_ind + 1, feed)
 
     @abc.abstractmethod
     def _get_page_promotions_qs(self) -> QuerySet:

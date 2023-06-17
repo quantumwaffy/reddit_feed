@@ -71,11 +71,13 @@ class FeedSettings(mixins.EnvSettingsMixin):
         PAGE_SIZE: The size of one page in the feed
         PROMOTION_POS_LIST: Positions in the feed to integrate promoted posts
         AUTHOR_PREFIX: Required prefix to the author's nickname
+        SHIFT_ON: Allows to find a new place for promoted posts when it's impossible to insert it in the right position
     """
 
     PAGE_SIZE: int = 27
     PROMOTION_POS_LIST: list[int] = [2, 16]
     AUTHOR_PREFIX: str = "t2_"
+    SHIFT_ON: bool = False
 
     @validator("PROMOTION_POS_LIST")
     def validate_promotion_pos_list(cls, promotion_pos_list: list) -> list[int]:

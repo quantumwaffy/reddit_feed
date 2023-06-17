@@ -2,15 +2,16 @@ import dataclasses
 
 from fastapi import APIRouter
 
-from feed.router import post_router, subreddit_router, test_router
+from feed import router as feed_router
 
 
 @dataclasses.dataclass
 class AppRouter:
     v1: tuple[APIRouter, ...] = (
-        subreddit_router,
-        post_router,
-        test_router,
+        feed_router.subreddit_router,
+        feed_router.post_router,
+        feed_router.reddit_feed_router,
+        feed_router.test_router,
     )
 
     @classmethod

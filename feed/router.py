@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
-from . import models, schemas, test_data_generator, utils
+from . import builder, models, schemas, test_data_generator, utils
 
 subreddit_router: APIRouter = APIRouter(
     prefix="/subreddit",
@@ -10,6 +10,11 @@ subreddit_router: APIRouter = APIRouter(
 post_router: APIRouter = APIRouter(
     prefix="/post",
     tags=["Post from Feed"],
+)
+
+reddit_feed_router: APIRouter = APIRouter(
+    prefix="/feed",
+    tags=["Reddit Feed"],
 )
 
 test_router: APIRouter = APIRouter(
@@ -34,10 +39,12 @@ async def create_post(post_data: schemas.PostInput) -> schemas.BasePost:
     return await schemas.BasePost.from_tortoise_orm(post_obj)
 
 
-@test_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=schemas.TestDataLog)
-async def create_test_data(init_data: schemas.TestDataInput):
+@test_router.post("/create", status_code=status.HTTP_201_CREATED)
+async def create_test_data(init_data: schemas.TestDataInput) -> schemas.TestDataLog:
     created_data: dict[str, int] = await test_data_generator.create_test_data(**init_data.dict())
     return schemas.TestDataLog(**created_data)
 
 
-# TODO: feed builder with integration of promoted posts and router for that
+@reddit_feed_router.get("/", status_code=status.HTTP_200_OK)
+async def get_feed(page: int = 1) -> list[schemas.BasePost]:
+    return await builder.BaseBuilder(page_num=page).get_feed()

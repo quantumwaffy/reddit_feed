@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, root_validator, validator
 
 from . import mixins
 
@@ -64,9 +64,40 @@ class TortoiseORMSettings(mixins.EnvSettingsMixin):
         return self._get_config("sqlite://:memory:")
 
 
+class FeedSettings(mixins.EnvSettingsMixin):
+    """Feed builder settings
+
+    Attrs:
+        PAGE_SIZE: The size of one page in the feed
+        PROMOTION_POS_LIST: Positions in the feed to integrate promoted posts
+        AUTHOR_PREFIX: Required prefix to the author's nickname
+    """
+
+    PAGE_SIZE: int = 27
+    PROMOTION_POS_LIST: list[int] = [2, 16]
+    AUTHOR_PREFIX: str = "t2_"
+
+    @validator("PROMOTION_POS_LIST")
+    def validate_promotion_pos_list(cls, promotion_pos_list: list) -> list[int]:
+        if not promotion_pos_list:
+            raise ValueError("'PROMOTION_POS_LIST' cannot be empty")
+        return promotion_pos_list
+
+    @root_validator()
+    def validate_page_settings(
+        cls, values: dict[str, str | list[int] | bool | int]
+    ) -> dict[str, str | list[int] | bool | int]:
+        if (promotion_pos_list := values.get("PROMOTION_POS_LIST")) and any(
+            ind > values["PAGE_SIZE"] for ind in promotion_pos_list
+        ):
+            raise ValueError("The value in the 'PROMOTION_POS_LIST' cannot be greater than the value of 'PAGE_SIZE'")
+        return values
+
+
 class Settings(BaseSettings):
     APP: AppSettings = AppSettings()
     ORM: TortoiseORMSettings = TortoiseORMSettings()
+    FEED: FeedSettings = FeedSettings()
 
 
 SETTINGS: Settings = Settings()

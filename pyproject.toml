@@ -16,6 +16,8 @@ validators = "^0.20.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.3"
+pytest = "^7.3.2"
+httpx = "^0.24.1"
 
 
 [tool.aerich]

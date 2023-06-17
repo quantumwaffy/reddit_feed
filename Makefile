@@ -1,6 +1,6 @@
 #!make
 
-.PHONY: help env init_linters up stop rm rmv rmi logs sh lint
+.PHONY: help env init_linters up stop rm rmv rmi logs sh lint test
 
 # --- Application virtual environment settings (can be changed)
 env_file_name := .env
@@ -24,6 +24,7 @@ help:
 	@echo "    logs             Stdout logs from docker containers"
 	@echo "    sh SERVICE       Run the command line in the selected SERVICE docker container"
 	@echo "    lint             Run linting"
+	@echo "    test             Run tests for the API service"
 
 
 env:
@@ -60,3 +61,6 @@ sh: up
 
 lint: init_linters
 	@pre-commit run -a
+
+test: up
+	@docker exec -it api pytest
